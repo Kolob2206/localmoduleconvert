@@ -1,0 +1,255 @@
+step "DacPac.Client.WorkbenchServices_Audit" {
+    properties = {
+        Octopus.Action.TargetRoles = "DacPacClient"
+    }
+
+    action {
+        action_type = "Octopus.TentaclePackage"
+        properties = {
+            Octopus.Action.CustomScripts.Deploy.ps1 = <<-EOT
+                #call the function from the script module loaded with this process
+                DeployDacPac -publishFile "WorkbenchServices.Audit.OctoDeploy.publish.xml" -dacPacFile "WorkbenchServices_Audit.dacpac"
+                
+            EOT
+            Octopus.Action.EnabledFeatures = "Octopus.Features.CustomScripts,Octopus.Features.SubstituteInFiles"
+            Octopus.Action.Package.DownloadOnTentacle = "False"
+            Octopus.Action.Package.FeedId = "Octopus Server (built-in)"
+            Octopus.Action.Package.PackageId = "api-package"
+            Octopus.Action.SubstituteInFiles.TargetFiles = "*.publish.xml"
+        }
+        tenant_tags = ["Product Tags/WorkBench"]
+
+        packages {
+            acquisition_location = "Server"
+            feed = "Octopus Server (built-in)"
+            package_id = "api-package"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "DacPac.Client.WorkbenchServices" {
+    properties = {
+        Octopus.Action.TargetRoles = "DacPacClient"
+    }
+
+    action {
+        action_type = "Octopus.TentaclePackage"
+        properties = {
+            Octopus.Action.CustomScripts.Deploy.ps1 = <<-EOT
+                #call the function from the script module loaded with this process
+                DeployDacPac -publishFile "WorkbenchServices.OctoDeploy.publish.xml" -dacPacFile "WorkbenchServices.dacpac"
+                
+            EOT
+            Octopus.Action.EnabledFeatures = "Octopus.Features.CustomScripts,Octopus.Features.SubstituteInFiles"
+            Octopus.Action.Package.DownloadOnTentacle = "False"
+            Octopus.Action.Package.FeedId = "Octopus Server (built-in)"
+            Octopus.Action.Package.PackageId = "api-package"
+            Octopus.Action.SubstituteInFiles.TargetFiles = "*.publish.xml"
+        }
+        tenant_tags = ["Product Tags/WorkBench"]
+
+        packages {
+            acquisition_location = "Server"
+            feed = "Octopus Server (built-in)"
+            package_id = "api-package"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "ServiceFabric.Client.AxiomaWorkbench" {
+    properties = {
+        Octopus.Action.TargetRoles = "ServiceFabricClient"
+    }
+
+    action {
+        action_type = "Octopus.AzureServiceFabricApp"
+        properties = {
+            Octopus.Action.EnabledFeatures = "Octopus.Features.SubstituteInFiles"
+            Octopus.Action.Package.DownloadOnTentacle = "True"
+            Octopus.Action.Package.FeedId = "Octopus Server (built-in)"
+            Octopus.Action.Package.PackageId = "api-package"
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.ServiceFabric.CopyPackageTimeoutSec = "3500"
+            Octopus.Action.ServiceFabric.OverrideUpgradeBehavior = "None"
+            Octopus.Action.ServiceFabric.OverwriteBehavior = "Always"
+            Octopus.Action.ServiceFabric.PublishProfileFile = "PublishProfiles\\OctoDeploy.xml"
+            Octopus.Action.ServiceFabric.RegisterApplicationTypeTimeoutSec = "3600"
+            Octopus.Action.ServiceFabric.SkipPackageValidation = "False"
+            Octopus.Action.SubstituteInFiles.TargetFiles = <<-EOT
+                *\ServiceManifest.xml
+                ApplicationParameters\OctoDeploy.xml
+                PublishProfiles\OctoDeploy.xml
+                ApplicationManifest.xml
+                
+            EOT
+            OctopusUseBundledTooling = "True"
+        }
+        tenant_tags = ["Product Tags/WorkBench"]
+
+        packages {
+            acquisition_location = "ExecutionTarget"
+            feed = "Octopus Server (built-in)"
+            package_id = "api-package"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "ServiceFabric.Client.AxiomaWorkbenchInfrastructureApp" {
+    properties = {
+        Octopus.Action.TargetRoles = "ServiceFabricClient"
+    }
+    start_trigger = "StartWithPrevious"
+
+    action {
+        action_type = "Octopus.AzureServiceFabricApp"
+        properties = {
+            Octopus.Action.EnabledFeatures = "Octopus.Features.SubstituteInFiles"
+            Octopus.Action.Package.DownloadOnTentacle = "True"
+            Octopus.Action.Package.FeedId = "Octopus Server (built-in)"
+            Octopus.Action.Package.PackageId = "api-package"
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.ServiceFabric.CopyPackageTimeoutSec = "3500"
+            Octopus.Action.ServiceFabric.OverrideUpgradeBehavior = "None"
+            Octopus.Action.ServiceFabric.OverwriteBehavior = "Always"
+            Octopus.Action.ServiceFabric.PublishProfileFile = "PublishProfiles\\OctoDeploy.xml"
+            Octopus.Action.ServiceFabric.RegisterApplicationTypeTimeoutSec = "3600"
+            Octopus.Action.ServiceFabric.SkipPackageValidation = "False"
+            Octopus.Action.SubstituteInFiles.TargetFiles = <<-EOT
+                *\ServiceManifest.xml
+                ApplicationParameters\OctoDeploy.xml
+                PublishProfiles\OctoDeploy.xml
+                ApplicationManifest.xml
+                
+            EOT
+            OctopusUseBundledTooling = "True"
+        }
+        tenant_tags = ["Product Tags/WorkBench"]
+
+        packages {
+            acquisition_location = "ExecutionTarget"
+            feed = "Octopus Server (built-in)"
+            package_id = "api-package"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "ServiceFabric.Client.AxiomaWorkbenchUIApp " {
+    properties = {
+        Octopus.Action.TargetRoles = "ServiceFabricClient"
+    }
+    start_trigger = "StartWithPrevious"
+
+    action {
+        action_type = "Octopus.AzureServiceFabricApp"
+        properties = {
+            Octopus.Action.EnabledFeatures = "Octopus.Features.SubstituteInFiles"
+            Octopus.Action.Package.DownloadOnTentacle = "True"
+            Octopus.Action.Package.FeedId = "Octopus Server (built-in)"
+            Octopus.Action.Package.PackageId = "api-package"
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.ServiceFabric.CopyPackageTimeoutSec = "3500"
+            Octopus.Action.ServiceFabric.OverrideUpgradeBehavior = "None"
+            Octopus.Action.ServiceFabric.OverwriteBehavior = "Always"
+            Octopus.Action.ServiceFabric.PublishProfileFile = "PublishProfiles\\OctoDeploy.xml"
+            Octopus.Action.ServiceFabric.RegisterApplicationTypeTimeoutSec = "3600"
+            Octopus.Action.ServiceFabric.SkipPackageValidation = "False"
+            Octopus.Action.SubstituteInFiles.TargetFiles = <<-EOT
+                *\ServiceManifest.xml
+                ApplicationParameters\OctoDeploy.xml
+                PublishProfiles\OctoDeploy.xml
+                ApplicationManifest.xml
+                
+            EOT
+            OctopusUseBundledTooling = "True"
+        }
+        tenant_tags = ["Product Tags/WorkBench"]
+
+        packages {
+            acquisition_location = "ExecutionTarget"
+            feed = "Octopus Server (built-in)"
+            package_id = "api-package"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "ServiceFabric.Client.AxiomaWorkbenchServicesApp " {
+    properties = {
+        Octopus.Action.TargetRoles = "ServiceFabricClient"
+    }
+    start_trigger = "StartWithPrevious"
+
+    action {
+        action_type = "Octopus.AzureServiceFabricApp"
+        properties = {
+            Octopus.Action.EnabledFeatures = "Octopus.Features.CustomScripts,Octopus.Features.SubstituteInFiles"
+            Octopus.Action.Package.DownloadOnTentacle = "True"
+            Octopus.Action.Package.FeedId = "Octopus Server (built-in)"
+            Octopus.Action.Package.PackageId = "api-package"
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.ServiceFabric.CopyPackageTimeoutSec = "3500"
+            Octopus.Action.ServiceFabric.OverrideUpgradeBehavior = "None"
+            Octopus.Action.ServiceFabric.OverwriteBehavior = "Always"
+            Octopus.Action.ServiceFabric.PublishProfileFile = "PublishProfiles\\OctoDeploy.xml"
+            Octopus.Action.ServiceFabric.RegisterApplicationTypeTimeoutSec = "3600"
+            Octopus.Action.ServiceFabric.SkipPackageValidation = "False"
+            Octopus.Action.SubstituteInFiles.TargetFiles = <<-EOT
+                *\ServiceManifest.xml
+                ApplicationParameters\OctoDeploy.xml
+                PublishProfiles\OctoDeploy.xml
+                ApplicationManifest.xml
+                
+            EOT
+            OctopusUseBundledTooling = "True"
+        }
+        tenant_tags = ["Product Tags/WorkBench"]
+
+        packages {
+            acquisition_location = "ExecutionTarget"
+            feed = "Octopus Server (built-in)"
+            package_id = "api-package"
+            properties = {
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "AxiomaWorkbench Post Deploy - CDN Version" {
+
+    action {
+        action_type = "Octopus.Script"
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Script.ScriptBody = "write-host 'hi'"
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
+        }
+        tenant_tags = ["Product Tags/WorkBench"]
+
+        packages "api-package" {
+            acquisition_location = "Server"
+            feed = "Octopus Server (built-in)"
+            package_id = "api-package"
+            properties = {
+                Extract = "True"
+                Purpose = ""
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
